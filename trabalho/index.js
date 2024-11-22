@@ -1,41 +1,52 @@
 import express from 'express';
-import historicoInflacao from './dados/dados.js'; 
+import { obterHistoricoCompleto, filtrarPorAno, calcularMediaAnual, calcularReajuste } from './servico/servicos.js';
 
 const app = express();
 const port = 8080;
 
 app.get('/historicoIPCA', (req, res) => {
-  res.json(historicoInflacao);
+  try {
+    const dados = obterHistoricoCompleto();
+    res.json(dados);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-app.get('/historicoIPCA/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10); 
-  const resultado = historicoInflacao.find(dado => dado.id === id);  
-
-  if (!resultado) {
-    return res.status(404).json({ error: 'ID não encontrado.' });
+app.get('/historicoIPCA/:ano', (req, res) => {
+  try {
+    const ano = parseInt(req.params.ano, 10);
+    const resultado = filtrarPorAno(ano);
+    res.json(resultado);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-
-  res.json(resultado);
 });
 
-app.get('/calcularReajuste/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);  
-  const dado = historicoInflacao.find(d => d.id === id);
-
-  if (!dado) {
-    return res.status(404).json({ error: 'ID não encontrado.' });
+app.get('/mediaAnual/:ano', (req, res) => {
+  try {
+    const ano = parseInt(req.params.ano, 10);
+    const media = calcularMediaAnual(ano);
+    res.json({ ano, media });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
+});
 
-  const reajuste = (valor, ipca) => valor * (1 + ipca / 100);
-
-  res.json({
-    id: dado.id,
-    ano: dado.ano,
-    mes: dado.mes,
-    ipca: dado.ipca,
-    reajusteCalculado: reajuste(100, dado.ipca).toFixed(2)  
-  });
+app.get('/calcularReajuste', (req, res) => {
+  try {
+    const { valor, mesInicial, anoInicial, mesFinal, anoFinal } = req.query;
+    const valorInicial = parseFloat(valor);
+    const dados = obterHistoricoCompleto();
+    const valorReajustado = calcularReajuste(valorInicial, mesInicial, anoInicial, mesFinal, anoFinal, dados);
+    res.json({
+      valorInicial: valorInicial.toFixed(2),
+      valorReajustado,
+      periodo: `${mesInicial}/${anoInicial} a ${mesFinal}/${anoFinal}`
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 app.listen(port, () => {
