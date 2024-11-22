@@ -1,40 +1,43 @@
 import express from 'express';
-import { buscaHist, buscarPorAno, buscarPorId } from './servico/servicos.js';
-
+import historicoInflacao from './dados/dados.js'; 
 
 const app = express();
+const port = 8080;
 
-app.get('/hist', (req, res) => {
-    const historico = buscaHist(); // Certifique-se de que buscaHist é uma função que retorna os dados
-    res.json(historico);
+app.get('/historicoIPCA', (req, res) => {
+  res.json(historicoInflacao);
 });
 
-app.get('/hist/ano/:ano', (req, res) => {
-    const ano = parseInt(req.params.ano, 10);
-    if (isNaN(ano)) {
-        return res.status(400).send({ "erro": "Ano inválido" });
-    }
-    const historico = buscarPorAno(ano);
-    if (historico) {
-        res.json(historico);
-    } else {
-        res.status(404).send({ "erro": "Ano não encontrado" });
-    }
+app.get('/historicoIPCA/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10); 
+  const resultado = historicoInflacao.find(dado => dado.id === id);  
+
+  if (!resultado) {
+    return res.status(404).json({ error: 'ID não encontrado.' });
+  }
+
+  res.json(resultado);
 });
 
-app.get('/hist/id/:idht', (req, res) => {
-    const idht = req.params.idht;
-    if (isNaN(parseInt(idht))) {
-        return res.status(400).send({ "erro": "Requisição inválida" });
-    }
-    const id = buscarPorId(idht);
-    if (id) {
-        res.json(id);
-    } else {
-        res.status(404).send({ "erro": "ID não encontrada" });
-    }
+app.get('/calcularReajuste/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);  
+  const dado = historicoInflacao.find(d => d.id === id);
+
+  if (!dado) {
+    return res.status(404).json({ error: 'ID não encontrado.' });
+  }
+
+  const reajuste = (valor, ipca) => valor * (1 + ipca / 100);
+
+  res.json({
+    id: dado.id,
+    ano: dado.ano,
+    mes: dado.mes,
+    ipca: dado.ipca,
+    reajusteCalculado: reajuste(100, dado.ipca).toFixed(2)  
+  });
 });
 
-app.listen(8080, () => {
-    console.log('Servidor rodando em http://localhost:8080');
+app.listen(port, () => {
+  console.log(`API rodando na porta ${port}`);
 });
