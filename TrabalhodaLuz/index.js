@@ -4,7 +4,7 @@ import {
     buscarHistoricoIPCAPorAno, 
     buscarHistoricoIPCAPorId, 
     calcularValorAjustadoPeloIPCA 
-} from './servicos/servicos.js';
+} from './servico/servicos.js';
 
 const app = express();
 
@@ -14,7 +14,7 @@ const gerarErro = (res, status, mensagem) => {
 };
 
 // Rota para buscar histórico do IPCA
-app.get('/histIPCA', (req, res) => {
+app.get('/historico-do-ipca', (req, res) => {
     const ano = req.query.ano;
     const resultado = (ano !== undefined) 
         ? buscarHistoricoIPCAPorAno(ano) 
@@ -30,7 +30,7 @@ app.get('/histIPCA', (req, res) => {
 });
 
 // Rota para cálculo ajustado pelo IPCA
-app.get('/histIPCA/calculo', (req, res) => {
+app.get('/calculo-ajustado-pelo-ipca', (req, res) => {
     const valor = parseFloat(req.query.valor);
     const mesInicial = parseInt(req.query.mesInicial);
     const anoInicial = parseInt(req.query.anoInicial);
@@ -58,7 +58,7 @@ app.get('/histIPCA/calculo', (req, res) => {
 });
 
 // Rota para buscar IPCA por ID
-app.get('/histIPCA/:id', (req, res) => {
+app.get('/historico-do-ipca/:id', (req, res) => {
     const id = buscarHistoricoIPCAPorId(req.params.id);
 
     if (id) {
