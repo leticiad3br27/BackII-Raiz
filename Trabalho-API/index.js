@@ -18,7 +18,7 @@ app.get('/histIPCA', (req, res) => {
     }
 });
 
-app.get('/histIPCA/calculo', (req,res) => {
+app.get('/histIPCA/calcular', (req,res) => {
     const valor = parseFloat(req.query.valor);
     const mesInicial = parseInt(req.query.mesInicial);
     const anoInicial = parseInt(req.query.anoInicial);
