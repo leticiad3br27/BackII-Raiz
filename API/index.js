@@ -1,54 +1,55 @@
 import express from 'express';
-import { retornaCampeonatos} from './servico/retornaCampeonatos_servico.js';
-import { retornaCampeonatosID } from './servico/retornaCampeonatos_servico.js';
-import { retornaCampeonatosAno} from './servico/retornaCampeonatos_servico.js';
-import { retornaCampeonatosTime} from './servico/retornaCampeonatos_servico.js'
-
-
+import { 
+  retornaCampeonatos,
+  retornaCampeonatosID,
+  retornaCampeonatosAno,
+  retornaCampeonatosTime
+} from './servico/retornaCampeonatos_servico.js';
+import { cadastraCampeonato } from './servico/cadastroCampeonato_servico.js';
 const app = express();
- 
+app.use(express.json());
 
+app.post('/campeonatos', async (req,res) =>{
+    const campeao= req.body.campeao;
+    const vice = req.body.vice;
+    const ano = req.body.ano;
+    await cadastraCampeonato(campeao,vice,ano);
+    res.status(204).send({"mensagem":"cadastro efetivado com sucesso!"})
+})
 
- app.get('/campeonatos/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
-    const campeonato = await retornaCampeonatosID(id);
-    if(campeonato.length > 0){
-      res.json(campeonato);
-    } else{
-      res.status(404).json({ mensagem: "Nenhum campeonato encontrado"});
-    }
+app.get('/campeonatos/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ mensagem: "ID inválido" });
+  }
+
+  const campeonato = await retornaCampeonatosID(id);
+  if (!campeonato || campeonato.length === 0) {
+    return res.status(404).json({ mensagem: "Nenhum campeonato encontrado" });
+  }
+
+  res.json(campeonato);
 });
 
-
 app.get('/campeonatos', async (req, res) => {
+  const { ano, time } = req.query;
   let campeonatos;
-  
-  const ano = req.query.ano;
-  const time = req.query.time;
 
-  if (typeof ano === 'undefined' && typeof time === 'undefined'){
-    campeonatos = await retornaCampeonatos();
-  } 
-  else if (typeof ano !== 'undefined') {
+  if (ano) {
     campeonatos = await retornaCampeonatosAno(ano);
-  }
-  else if (typeof time !== 'undefined') {
+  } else if (time) {
     campeonatos = await retornaCampeonatosTime(time);
+  } else {
+    campeonatos = await retornaCampeonatos();
   }
 
-  if(campeonatos.length > 0) {
-    res.json(campeonatos);
-  } else{
-    res.status(404).json({ mensagem: "Nenhum campeonato encontrado"});
+  if (!campeonatos || campeonatos.length === 0) {
+    return res.status(404).json({ mensagem: "Nenhum campeonato encontrado" });
   }
 
-})
+  res.json(campeonatos);
+});
 
-
-
-app.listen(9000, async () => {
-    const data = new Date();
-    console.log("Servidor node iniciado em: "+data);
-
- 
-})
+app.listen(9000, () => {
+  console.log("Servidor node iniciado na porta 9000");
+});
