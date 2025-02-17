@@ -1,18 +1,26 @@
 import express from 'express';
 import cors from 'cors'; 
-import { 
-  retornaCampeonatos,
-  retornaCampeonatosID,
-  retornaCampeonatosAno,
-  retornaCampeonatosTime
-} from './servico/retornaCampeonatos_servico.js';
+import { retornaCampeonatos,retornaCampeonatosID,retornaCampeonatosAno,retornaCampeonatosTime} from './servico/retornaCampeonatos_servico.js';
 import { cadastraCampeonato } from './servico/cadastroCampeonato_servico.js';
 import { atualizaCampeonato, atualizaCampeonatoParcial} from './servico/atualizaCampeonato.js';
+import {deletaCampeoato} from "./servico/deletaCampeonato.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.delete('/campeonatos/:id', async (req, res) =>{
+  const {id}= req.params;
+  const resultado= await deletaCampeoato(id);
+   if (resultado.affectedRows>0) {
+    res.status(202).send("Registro deletado com sucesso");
+   } else {
+    res.status(404).send("Registro não encontrado");
+   }
 
+
+
+
+})
 app.patch('/campeonatos/:id', async (req, res) => {
   const { id } = req.params;
   const { campeao, vice, ano } = req.body;
