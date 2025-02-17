@@ -1,0 +1,118 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    max-width: 400px;
+    width: 100%;
+    background: #050001; 
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;  
+}
+
+.container:hover {
+    transform: scale(1.02);
+}
+
+h1 {
+    text-align: center;
+    color: #c8102e; /* Vermelho Flamengo */
+    font-size: 26px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #fff;
+    text-align: left;
+}
+
+input {
+    width: 100%;
+    max-width: 350px; 
+    padding: 12px;
+    border: 2px solid #fff; 
+    border-radius: 10px;
+    background-color: #333; 
+    color: #fff; 
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input::placeholder {
+    color: #ccc; /* Cor do placeholder */
+}
+
+input:focus {
+    border-color: #c8102e; 
+    outline: none;
+    box-shadow: 0 0 5px rgba(200, 16, 46, 0.5);
+}
+
+button {
+    width: 100%;
+    max-width: 350px; 
+    padding: 12px;
+    background-color: #c8102e; 
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background-color: #a60c24; 
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#mensagem {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: bold;
+    color: #dc3545; 
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+#mensagem.show {
+    opacity: 1;
+}
+
+@media (max-width: 500px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    input, button {
+        padding: 10px;
+    }
+}
